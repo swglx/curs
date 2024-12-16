@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о больничных</title>
+    <link rel="stylesheet" type="text/css" href="/static/dsick.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Информация о больничных</h1>
+        <button onclick="history.back()" class="back-button">Назад</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Номер больничного</th>
+                    <th>Врач</th>
+                    <th>Диагноз</th>
+                    <th>Дата диагноза</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dss in ds %}
+                <tr>
+                    <td>{{ dss[0] }}</td>
+                    <td>{{ dss[1] }}</td>
+                    <td>{{ dss[2] }}</td>
+                    <td>{{ dss[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

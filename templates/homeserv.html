@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приёмы на дому</title>
+    <link rel="stylesheet" type="text/css" href="/static/homeserv.css">
+    <script src="/static/homeserv.js" defer></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Приёмы на дому</h1>
+        <div class="button-group">
+            <button onclick="history.back()" class="back-button">Назад</button>
+            <button onclick="openModal()" class="form-button">Добавить приём</button>
+            <button onclick="exportToExcel()" class="form-button">Экспорт в Excel</button>
+            <button onclick="openDateModal()" class="form-button">График</button>
+        </div>
+
+        <!-- Модальное окно для добавления приёма -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <form class="form-inline" action="/addHome" method="post">
+                    <select name="pat_id" class="form-select" required>
+                        <option value="" disabled selected hidden>Выберите Пациента</option>
+                        {% for carts in cart %}
+                        <option value="{{ carts[0] }}">{{ carts[4] }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="doc_id" class="form-select" required>
+                        <option value="" disabled selected hidden>Выберите Врача</option>
+                        {% for doctors in doctor %}
+                        <option value="{{ doctors[0] }}">{{ doctors[2] }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="date" name="date" class="form-input" required>
+                    <input type="submit" value="Добавить" class="form-button">
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно для выбора даты -->
+        <div id="dateModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeDateModal()">&times;</span>
+                <h2>Выберите период</h2>
+                <div class="date-input-group">
+                    <label for="startDate">Дата начала:</label>
+                    <input type="date" id="startDate" class="form-input" required>
+                </div>
+                <div class="date-input-group">
+                    <label for="endDate">Дата конца:</label>
+                    <input type="date" id="endDate" class="form-input" required>
+                </div>
+                <button onclick="createChartWithDate()" class="form-button">Построить график</button>
+                <button onclick="createChartForAllData()" class="form-button">Вывести график по всем данным</button>
+            </div>
+        </div>
+
+        <!-- Модальное окно для графика -->
+        <div id="chartModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeChartModal()">&times;</span>
+                <h2>График</h2>
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Номер приёма</th>
+                        <th>Врач</th>
+                        <th>Пациент</th>
+                        <th>Дата приёма</th>
+                        <th>Удалить</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for homes in home %}
+                    <tr>
+                        <td>{{ homes[0] }}</td>
+                        <td>{{ homes[1] }}</td>
+                        <td>{{ homes[2] }}</td>
+                        <td>{{ homes[3] }}</td>
+                        <td>
+                            <form action="/delete_home" method="post" onsubmit="return confirmDelete()">
+                                <input type="hidden" name="home_id" value="{{ homes[0] }}">
+                                <button type="submit" class="delete-button">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

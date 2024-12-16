@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>medcart</title>
+    <link rel="stylesheet" type="text/css" href="/static/medcart.css">
+    <script src="/static/medcart.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        .modal {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Пациенты</h1>
+            <div class="button-wrapper">
+                <button onclick="history.back()" class="form-button back-button">Назад</button>
+                <button onclick="openModal()" class="form-button add-button">Добавить пациента</button>
+                <button onclick="exportToExcel()" class="form-button export-button">Экспорт в Excel</button>
+            </div>
+        </header>
+        <input type="text" id="searchInput" placeholder="Поиск по фамилии" class="search-input">
+
+        <!-- Модальное окно для добавления пациента -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <form class="modal-form" action="/addPatient" method="post">
+                    <h2>Добавить пациента</h2>
+                    <div class="form-group">
+                        <label for="plot">Номер участка:</label>
+                        <select name="plot_id" id="plot" class="form-control">
+                            {% for plots in plot %}
+                            <option value="{{ plots[0] }}">{{ plots[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="policyNumber">Номер полиса:</label>
+                        <input type="text" name="policy_number" id="policyNumber" class="form-control" placeholder="Номер полиса">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Имя:</label>
+                        <input type="text" name="name" id="name" class="form-control" placeholder="Имя">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Фамилия:</label>
+                        <input type="text" name="surname" id="surname" class="form-control" placeholder="Фамилия">
+                    </div>
+                    <div class="form-group">
+                        <label for="midname">Отчество:</label>
+                        <input type="text" name="midname" id="midname" class="form-control" placeholder="Отчество">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Адрес проживания:</label>
+                        <input type="text" name="address" id="address" class="form-control" placeholder="Адрес проживания">
+                    </div>
+                    <div class="form-group">
+                        <label for="workPlace">Место работы:</label>
+                        <input type="text" name="work_place" id="workPlace" class="form-control" placeholder="Место работы">
+                    </div>
+                    <div class="form-group">
+                        <label for="complaints">Жалобы:</label>
+                        <input type="text" name="complaints" id="complaints" class="form-control" placeholder="Жалобы">
+                    </div>
+                    <input type="submit" value="Добавить" class="form-button add-button">
+                </form>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Номер полиса</th>
+                    <th>Номер участка</th>
+                    <th data-sort>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Адрес проживания</th>
+                    <th>Место работы</th>
+                    <th>Жалобы</th>
+                    <th>Обновить</th>
+                    <th>Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for carts in cart %}
+                <tr>
+                    <td>{{ carts[0] }}</td>
+                    <td>{{ carts[1] }}</td>
+                    <td>{{ carts[2] }}</td>
+                    <td>{{ carts[4] }}</td>
+                    <td>{{ carts[3] }}</td>
+                    <td>{{ carts[5] }}</td>
+                    <td>{{ carts[6] }}</td>
+                    <td>{{ carts[7] }}</td>
+                    <td>{{ carts[8] }}</td>
+                    <td>
+                        <button onclick="openUpdateModal('{{ carts[3] }}')" class="form-button update-button">Обновить</button>
+                    </td>
+                    <td>
+                        <form action="/delete_patient" method="post" onsubmit="return confirmDelete()">
+                            <input type="hidden" name="name" value="{{ carts[3] }}">
+                            <input type="submit" value="Удалить" class="form-button delete-button">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Модальное окно для обновления информации о пациенте -->
+<div id="updateModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeUpdateModal()">&times;</span>
+        <h2>Обновление информации о пациенте</h2>
+        <form class="modal-form" action="/update_patient" method="post">
+            <input type="hidden" name="name" id="updateName" value="">
+            <div class="form-group">
+                <label for="updatePolicyNumber">Новый номер полиса:</label>
+                <input type="text" name="new_policy_number" placeholder="Новый номер полиса" id="updatePolicyNumber" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="updatePlotId">Новый номер участка:</label>
+                <input type="text" name="new_plot_id" placeholder="Новый номер участка" id="updatePlotId" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="updateSurname">Новая фамилия:</label>
+                <input type="text" name="new_surname" placeholder="Новая фамилия" id="updateSurname" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="updateAddress">Новый адрес:</label>
+                <input type="text" name="new_address" placeholder="Новый адрес" id="updateAddress" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="updateWork">Новое место работы:</label>
+                <input type="text" name="new_work" placeholder="Новое место работы" id="updateWork" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="updateComplaints">Новые жалобы:</label>
+                <input type="text" name="new_complaints" placeholder="Новые жалобы" id="updateComplaints" class="form-control">
+            </div>
+            <input type="submit" value="Обновить" class="form-button add-button">
+        </form>
+    </div>
+</div>
+
+    <script>
+        let sortDescending = false;
+
+        function sortTable() {
+            let tableBody = document.querySelector('tbody');
+            let rows = Array.from(tableBody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                let surnameA = a.cells[3].textContent.toLowerCase();
+                let surnameB = b.cells[3].textContent.toLowerCase();
+                return sortDescending ? surnameA.localeCompare(surnameB) : surnameB.localeCompare(surnameA);
+            });
+            tableBody.innerHTML = '';
+            rows.forEach(row => tableBody.appendChild(row));
+            sortDescending = !sortDescending;
+        }
+
+        document.querySelector('th[data-sort]').addEventListener('click', sortTable);
+
+        function searchBySurname() {
+            let searchValue = document.getElementById("searchInput").value.toLowerCase();
+            let rows = document.querySelectorAll("table tbody tr");
+            rows.forEach(row => {
+                let surname = row.cells[3].textContent.toLowerCase();
+                row.style.display = surname.includes(searchValue) ? "" : "none";
+            });
+        }
+
+        document.getElementById("searchInput").addEventListener("input", searchBySurname);
+    </script>
+</body>
+</html>

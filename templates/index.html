@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+    <link rel="stylesheet" type="text/css" href="/static/index.css">
+</head>
+<body>
+    <div class="container">
+        <form class="form-container" action="/home" method="POST">
+            <h2 class="form-title">Добро пожаловать</h2>
+            <p class="form-subtitle">Пожалуйста, войдите в свою учетную запись</p>
+
+            <label class="form-label" for="login">Логин:</label>
+            <input class="form-input" type="text" id="login" name="login" required>
+
+            <label class="form-label" for="password">Пароль:</label>
+            <input class="form-input" type="password" id="password" name="password" required>
+
+            <input class="form-submit" type="submit" value="Войти">
+        </form>
+    </div>
+</body>
+</html>

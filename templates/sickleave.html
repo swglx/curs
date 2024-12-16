@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Больничные Листы</title>
+    <link rel="stylesheet" type="text/css" href="/static/sick.css">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="/static/sick.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Больничные Листы</h1>
+
+        <div class="button-group">
+            <button onclick="history.back()" class="back-button">Назад</button>
+            <button onclick="openModal()">Добавить больничный</button>
+            <button onclick="location.href='/dsick'">Информация</button>
+            <button onclick="exportToExcel()">Экспорт в Excel</button>
+        </div>
+
+        <!-- Модальное окно для добавления больничного -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Добавить Больничный</h2>
+                <form class="form-inline" action="/addSickleave" method="post">
+                    <select name="pat_id" required>
+                        <option value="" disabled selected hidden>Выберите Пациента</option>
+                        {% for carts in cart %}
+                        <option value="{{ carts[0] }}">{{ carts[4] }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="doc_id" required>
+                        <option value="" disabled selected hidden>Выберите Врача</option>
+                        {% for doctors in doctor %}
+                        <option value="{{ doctors[0] }}">{{ doctors[2] }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="date_open" placeholder="Дата открытия" required>
+                    <input type="text" name="date_close" placeholder="Дата закрытия" required>
+                    <select name="diag_id" required>
+                        <option value="" disabled selected hidden>Выберите Диагноз</option>
+                        {% for diagnosis in diagnoses %}
+                        <option value="{{ diagnosis[0] }}">{{ diagnosis[4] }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="date_diag" placeholder="Дата диагноза" required>
+                    <input type="submit" value="Добавить">
+                </form>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Номер больничного</th>
+                    <th>Пациент</th>
+                    <th>Врач</th>
+                    <th>Дата выдачи</th>
+                    <th>Дата закрытия</th>
+                    <th>Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sicks in sick %}
+                <tr>
+                    <td>{{ sicks[0] }}</td>
+                    <td>{{ sicks[1] }}</td>
+                    <td>{{ sicks[2] }}</td>
+                    <td>{{ sicks[3] }}</td>
+                    <td>{{ sicks[4] }}</td>
+                    <td>
+                        <form action="/delete_sick" method="post" onsubmit="return confirmDelete()">
+                            <input type="hidden" name="sick_id" value="{{ sicks[0] }}">
+                            <input type="submit" value="Удалить" class="delete-button">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

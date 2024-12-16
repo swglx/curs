@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Врачи</title>
+    <link rel="stylesheet" type="text/css" href="/static/doctor.css">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="/static/doctor.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Врачи</h1>
+        <div class="button-group">
+            <button onclick="history.back()" class="back-button">Назад</button>
+            <button onclick="openModal()">Добавить врача</button>
+            <button onclick="exportToExcel()">Экспорт в Excel</button>
+            <button onclick="location.href='/spec'" class="info-button">Информация</button>
+        </div>
+
+        <!-- Модальное окно для добавления врача -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Добавить Врача</h2>
+                <form class="form-inline" action="/addDoctor" method="post">
+                    <input type="text" name="name" placeholder="Имя" required>
+                    <input type="text" name="surname" placeholder="Фамилия" required>
+                    <input type="text" name="midname" placeholder="Отчество" required>
+                    <select name="cabinet_id" required>
+                        <option value="" disabled selected hidden>Выберите Кабинет</option>
+                        {% for cabinet in cabinets %}
+                        <option value="{{ cabinet[0] }}">{{ cabinet[1] }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="dsp_id" required>
+                        <option value="" disabled selected hidden>Выберите Специальность</option>
+                        {% for ds in dsp %}
+                        <option value="{{ ds[0] }}">{{ ds[1] }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="place" placeholder="Место получения" required>
+                    <input type="text" name="date" placeholder="Дата получения" required>
+                    <input type="submit" value="Добавить" class="add-button">
+                </form>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Doctor ID</th>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Номер кабинета</th>
+                    <th>Специальность</th>
+                    <th>Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctors in doctor %}
+                <tr>
+                    <td>{{ doctors[0] }}</td>
+                    <td>{{ doctors[2] }}</td>
+                    <td>{{ doctors[1] }}</td>
+                    <td>{{ doctors[3] }}</td>
+                    <td>{{ doctors[4] }}</td>
+                    <td>{{ doctors[5] }}</td>
+                    <td>
+                        <form action="/delete_doctor" method="post" onsubmit="return confirmDelete()">
+                            <input type="hidden" name="doc_id" value="{{ doctors[0] }}">
+                            <input type="submit" value="Удалить" class="delete-button">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Модальное окно для обновления врача (если нужно добавить в будущем) -->
+        <div id="updateModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeUpdateModal()">&times;</span>
+                <h2>Обновление Врача</h2>
+                <form id="updateForm" action="/updateDoctor" method="POST">
+                    <input type="hidden" id="updateDoctorId" name="update_doctor_id" value="">
+                    <div class="form-inline">
+                        <label for="updateSpecialty">Специальность:</label>
+                        <select id="updateSpecialty" name="new_specialty" required>
+                            <option value="Специальность 1">Специальность 1</option>
+                            <option value="Специальность 2">Специальность 2</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

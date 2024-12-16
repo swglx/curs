@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диспансер</title>
+    <link rel="stylesheet" type="text/css" href="/static/disp.css">
+    <script src="/static/disp.js" defer></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Диспансер</h1>
+
+        <div class="button-wrapper">
+            <button onclick="history.back()" class="form-button back-button">Назад</button>
+            <button onclick="openModal()" class="form-button">Добавить приём</button>
+            <button onclick="exportToExcel()" class="form-button">Экспорт в Excel</button>
+            <button onclick="openDateModal()" class="form-button">График</button>
+        </div>
+
+        <!-- Модальное окно для добавления приёма -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Добавить Приём</h2>
+                <form class="form-container" action="/addDispensary" method="post">
+                    <div class="form-group">
+                        <label for="pat_id">Выберите Пациента:</label>
+                        <select name="pat_id" id="pat_id" required>
+                            <option value="" disabled selected hidden>Выберите Пациента</option>
+                            {% for carts in cart %}
+                            <option value="{{ carts[0] }}">{{ carts[4] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doc_id">Выберите Врача:</label>
+                        <select name="doc_id" id="doc_id" required>
+                            <option value="" disabled selected hidden>Выберите Врача</option>
+                            {% for doctors in doctor %}
+                            <option value="{{ doctors[0] }}">{{ doctors[2] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="diag_id">Выберите Диагноз:</label>
+                        <select name="diag_id" id="diag_id" required>
+                            <option value="" disabled selected hidden>Выберите Диагноз</option>
+                            {% for diagnosis in diagnoses %}
+                            <option value="{{ diagnosis[0] }}">{{ diagnosis[4] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Дата явки:</label>
+                        <input type="date" name="date" id="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Добавить" class="form-button">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно для выбора даты -->
+        <div id="dateModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeDateModal()">&times;</span>
+                <h2>Выберите период</h2>
+                <label for="startDate">Дата начала:</label>
+                <input type="date" id="startDate" required>
+                <label for="endDate">Дата конца:</label>
+                <input type="date" id="endDate" required>
+                <div class="button-group">
+                    <button onclick="createChartWithDate()" class="form-button">Построить график</button>
+                    <button onclick="createChartForAllData()" class="form-button">Вывести график по всем данным</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для графика -->
+        <div id="chartModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeChartModal()">&times;</span>
+                <h2>График явок</h2>
+                <canvas id="myChart" style="width: 100%; height: 400px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Таблица приёмов -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Номер</th>
+                    <th>Пациент</th>
+                    <th>Врач</th>
+                    <th>Диагноз</th>
+                    <th>Дата явки</th>
+                    <th>Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disps in disp %}
+                <tr>
+                    <td>{{ disps[0] }}</td>
+                    <td>{{ disps[1] }}</td>
+                    <td>{{ disps[2] }}</td>
+                    <td>{{ disps[3] }}</td>
+                    <td>{{ disps[4] }}</td>
+                    <td>
+                        <form action="/delete_dispensary" method="post" onsubmit="return confirmDelete()">
+                            <input type="hidden" name="disp_id" value="{{ disps[0] }}">
+                            <button type="submit" class="delete-button">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

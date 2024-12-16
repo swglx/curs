@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='admin.css') }}">
+
+</head>
+<body>
+    <div class="auth-link">
+        <a href="{{ url_for('index') }}">Вернуться к авторизации</a>
+    </div>
+    <div class="container">
+        <header>
+            <h1>Admin</h1>
+        </header>
+
+        <section class="form-section">
+            <h2>Добавить пользователей</h2>
+            <form id="addUserForm" method="post" action="/add_user" onsubmit="return addUser(event);">
+                <input type="text" id="log" name="log" placeholder="Логин" required>
+                <input type="password" id="password" name="password" placeholder="Пароль" required>
+                <button type="submit">Добавить</button>
+            </form>
+        </section>
+
+        <section class="user-section">
+            <h2>Пользователи</h2>
+            <input type="search" id="searchInput" placeholder="Поиск по логину" oninput="searchUsers()">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Логин</th>
+                        <th>Пароль</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    {% for user in users %}
+                    <tr class="user-row">
+                        <td>{{ user[0] }}</td>
+                        <td>{{ user[1] }}</td>
+                        <td>{{ user[2] }}</td>
+                        <td>
+                            <form action="/delete_user" method="post" onsubmit="return confirmDelete()">
+                                <input type="hidden" name="user_id" value="{{ user[0] }}">
+                                <input type="submit" value="Удалить" class="delete-button">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>

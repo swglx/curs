@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #F3E5F5, #BBDEFB);
+            color: #333;
+        }
+
+        .auth-link {
+            position: absolute; /* Абсолютное позиционирование */
+            top: 20px; /* Отступ от верхней части */
+            left: 20px; /* Отступ от левой стороны */
+            z-index: 1000; /* Убедитесь, что ссылка всегда сверху */
+        }
+
+        .auth-link a {
+            color: white; /* Цвет текста ссылки */
+            text-decoration: none; /* Убираем подчеркивание */
+            font-weight: bold; /* Жирный шрифт */
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline; /* Подчеркивание при наведении */
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #6200ea;
+            color: white;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .cards-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 20px;
+            flex: 1 1 calc(30% - 20px);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card-title {
+            color: #6200ea;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #6200ea;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #3700b3;
+        }
+
+        .news-section {
+            margin-top: 40px;
+        }
+
+        .news-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        .news-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .news-item h5 {
+            margin: 0;
+        }
+
+        .news-item p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-link">
+        <a href="{{ url_for('index') }}">Выход</a>
+    </div>
+    <header>
+        <h1>Регистратура</h1>
+    </header>
+    <main class="container">
+        <section class="cards-section">
+            <div class="card">
+                <h3 class="card-title">Приём</h3>
+                <a href="{{ url_for('display_clinic') }}" class="btn">Приём в поликлинике</a>
+                <a href="{{ url_for('display_home') }}" class="btn">Приём на дому</a>
+                <a href="{{ url_for('display_dispensary') }}" class="btn">Диспансер</a>
+            </div>
+            <div class="card">
+                <h3 class="card-title">Медицинская карточка и больничный лист</h3>
+                <a href="{{ url_for('display_carts') }}" class="btn">Медицинская карточка</a>
+                <a href="{{ url_for('display_sick') }}" class="btn">Больничный лист</a>
+            </div>
+            <div class="card">
+                <h3 class="card-title">Дополнительные данные</h3>
+                <a href="{{ url_for('display_doctor') }}" class="btn">Врачи</a>
+                <a href="{{ url_for('display_cabinets') }}" class="btn">Кабинеты</a>
+                <a href="{{ url_for('display_plots') }}" class="btn">Участки</a>
+                <a href="{{ url_for('display_dsp') }}" class="btn">Специализации</a>
+                <a href="{{ url_for('display_diagnoses') }}" class="btn">Диагнозы</a>
+            </div>
+        </section>
+
+        <section class="news-section">
+            <h2>Медицинские новости</h2>
+            <div id="news-container" class="news-list"></div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

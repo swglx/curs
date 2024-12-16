@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о специальностях</title>
+    <link rel="stylesheet" type="text/css" href="/static/spec.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Информация о специальностях</h1>
+        <button onclick="history.back()" class="back-button">Назад</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Врач</th>
+                    <th>Специальность</th>
+                    <th>Место получения</th>
+                    <th>Дата получения</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for specs in spec %}
+                <tr>
+                    <td>{{ specs[0] }}</td>
+                    <td>{{ specs[1] }}</td>
+                    <td>{{ specs[2] }}</td>
+                    <td>{{ specs[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

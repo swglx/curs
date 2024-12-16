@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>clinicserv</title>
+    <link rel="stylesheet" type="text/css" href="/static/clinic.css">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/clinic.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Приём в поликлинике</h1>
+        <div class="button-group">
+            <button onclick="history.back()" class="back-button">Назад</button>
+            <button onclick="openModal()">Добавить приём</button>
+            <button onclick="exportToExcel()">Экспорт в Excel</button>
+            <button onclick="openDateModal()">График</button>
+        </div>
+
+        <!-- Модальное окно для добавления приёма -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Добавить Приём</h2>
+                <form class="form-inline" action="/addClinic" method="post">
+                    <select name="pat_id" required>
+                        <option value="" disabled selected hidden>Выберите Пациента</option>
+                        {% for carts in cart %}
+                        <option value="{{ carts[0] }}">{{ carts[4] }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="doc_id" required>
+                        <option value="" disabled selected hidden>Выберите Врача</option>
+                        {% for doctors in doctor %}
+                        <option value="{{ doctors[0] }}">{{ doctors[2] }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="cab_id" required>
+                        <option value="" disabled selected hidden>Выберите Кабинет</option>
+                        {% for cabinet in cabinets %}
+                        <option value="{{ cabinet[0] }}">{{ cabinet[1] }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="date" name="date" required>
+                    <select name="rec" required>
+                        <option value="" disabled selected hidden>Выберите Приём</option>
+                        <option value="проведен">Проведен</option>
+                        <option value="не проведен">Не проведен</option>
+                    </select>
+                    <input type="text" name="app" placeholder="Назначения" required>
+                    <input type="submit" value="Добавить" class="add-button">
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно для выбора даты -->
+        <div id="dateModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeDateModal()">&times;</span>
+                <h2>График</h2>
+                <p>Выберите период для построения графика:</p>
+                <div class="date-input-group">
+                    <label for="startDate">Дата начала:</label>
+                    <input type="date" id="startDate" required>
+                </div>
+                <div class="date-input-group">
+                    <label for="endDate">Дата конца:</label>
+                    <input type="date" id="endDate" required>
+                </div>
+                <div class="button-group">
+                    <button onclick="createChartWithDate()">Построить график</button>
+                    <button onclick="createChartForAllData()">Вывести график по всем данным</button>
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Номер приёма</th>
+                    <th>Пациент</th>
+                    <th>Врач</th>
+                    <th>Номер кабинета</th>
+                    <th>Дата приёма</th>
+                    <th>Приём</th>
+                    <th>Назначения</th>
+                    <th>Удалить</th>
+                    <th>Обновить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for clinics in clinic %}
+                <tr>
+                    <td>{{ clinics[0] }}</td>
+                    <td>{{ clinics[1] }}</td>
+                    <td>{{ clinics[2] }}</td>
+                    <td>{{ clinics[3] }}</td>
+                    <td>{{ clinics[4] }}</td>
+                    <td>{{ clinics[5] }}</td>
+                    <td>{{ clinics[6] }}</td>
+                    <td>
+                        <form action="/delete_clinic" method="post" onsubmit="return confirmDelete()">
+                            <input type="hidden" name="clinic_id" value="{{ clinics[0] }}">
+                            <input type="submit" value="Удалить" class="delete-button">
+                        </form>
+                    </td>
+                    <td>
+                        <button onclick="openUpdateModal('{{ clinics[0] }}')" class="button">Обновить</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Модальное окно для обновления записи -->
+        <div id="updateModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeUpdateModal()">&times;</span>
+                <h2>Обновление записи</h2>
+                <form id="updateForm" action="/update_clinic" method="POST">
+                    <input type="hidden" id="updateClinicId" name="update_clinic_id" value="">
+                    <div class="form-inline">
+                        <label for="updateStatus">Статус:</label>
+                        <select id="updateStatus" name="new_rec" required>
+                            <option value="Проведен">Проведен</option>
+                            <option value="Не проведен">Не проведен</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                         <button type="submit" class="add-button">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно для графика -->
+        <div id="chartModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeChartModal()">&times;</span>
+                <h2>График</h2>
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
